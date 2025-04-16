@@ -17,9 +17,9 @@ app.get('/api/weather', async (req, res) => {
     const API_KEY = process.env.WEATHER_API_KEY
     const {city}  = req.query;
 
-    if(!lat || !lot) {
-        return res.status(400).json({ error: 'Lattitude and Longitude Required' });
-    }
+    if (!city) {
+        return res.status(400).json({ error: 'City is required' });
+      }
 
     const URL = `http://api.weatherapi.com/v1/current.json?key=${API_KEY}&q=${city}`;
 
