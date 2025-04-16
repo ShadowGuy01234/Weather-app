@@ -1,7 +1,6 @@
 import React from "react";
 import { useState } from "react";
 import axios from "axios";
-import { data } from "react-router-dom";
 
 function SearchInput() {
   const [city, setCity] = useState("");
@@ -13,7 +12,7 @@ function SearchInput() {
       const res = await axios.get(`http://localhost:5174/api/weather`, {
         params: { city },
       });
-      console.log(res.data)
+      console.log(res.data);
     } catch (err) {
       console.error("Error getting Weather data", err.message);
     }
