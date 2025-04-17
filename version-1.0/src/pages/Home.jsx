@@ -1,8 +1,5 @@
-/* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
-import SearchInput from "../components/SearchInput";
 import Navbar from "../components/Navbar";
-import axios from "axios";
 import "../App.css";
 import {
   WiDaySunny,
@@ -20,8 +17,8 @@ function Home() {
   const [error, setError] = useState(null);
   const [showHourly, setShowHourly] = useState(false);
 
-  const fetchWeather = async () => {
-    if (!city.trim()) {
+  const fetchWeather = async (cityName) => {
+    if (!cityName.trim()) {
       setError("Please enter a city name");
       return;
     }
@@ -30,30 +27,18 @@ function Home() {
     setError(null);
 
     try {
-      const locationCoordinate = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(
-        city
-      )}&count=1`;
-      const geoResponse = await axios.get(locationCoordinate);
-
-      if (!geoResponse.data.results || geoResponse.data.results.length === 0) {
-        setError("No location found.");
-        return;
+      const response = await fetch(`http://localhost:3032/api/weather?city=${encodeURIComponent(cityName)}`);
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to fetch weather data");
       }
 
-      const { latitude, longitude, name, timezone } =
-        geoResponse.data.results[0];
-
-      const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m,precipitation,weathercode,wind_speed_10m&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_sum&timezone=${encodeURIComponent(
-        timezone
-      )}`;
-
-      const weatherResponse = await axios.get(weatherUrl);
-
       setWeatherData({
-        location: name,
-        timezone,
-        daily: weatherResponse.data.daily,
-        hourly: weatherResponse.data.hourly,
+        location: data.city,
+        timezone: data.timezone,
+        daily: data.daily,
+        hourly: data.hourly,
       });
     } catch (error) {
       setError(error.message);
@@ -64,7 +49,7 @@ function Home() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    fetchWeather();
+    fetchWeather(city);
   };
 
   const formatDate = (dateString) => {
@@ -85,34 +70,22 @@ function Home() {
 
       navigator.geolocation.getCurrentPosition(
         async (position) => {
-          const { latitude, longitude } = position.coords;
           try {
+            const { latitude, longitude } = position.coords;
+            
             // Get location name
             const res = await fetch(
               `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
             );
             const data = await res.json();
-            const city =
+            const detectedCity =
               data.address.city ||
               data.address.town ||
               data.address.village ||
               data.display_name;
-            console.log(data);
-
-            // Get timezone
-            const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-            const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m,precipitation,weathercode,wind_speed_10m&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_sum&timezone=auto`;
-
-            const response = await axios.get(weatherUrl);
-            console.log(response);
-
-            setWeatherData({
-              location: city,
-              timezone: tz,
-              daily: response.data.daily,
-              hourly: response.data.hourly,
-            });
+            
+            // Fetch weather using the detected city name
+            fetchWeather(detectedCity);
           } catch (error) {
             setError("Could not fetch weather for current location.");
           }
@@ -221,7 +194,7 @@ function Home() {
                       </p>
                     </div>
                     <div className="text-right">
-                      {getWeatherIcon(weatherData.daily.weathercode[0])}
+                      {getWeatherIcon(weatherData.daily.weathercode ? weatherData.daily.weathercode[0] : 0)}
                       <p className="capitalize text-blue-800">
                         {weatherData.daily.precipitation_sum[0] > 0
                           ? "Rainy"
@@ -248,7 +221,7 @@ function Home() {
                           {formatDate(date)}
                         </p>
                         <div className="my-2 flex justify-center">
-                          {getWeatherIcon(weatherData.daily.weathercode[index])}
+                          {getWeatherIcon(weatherData.daily.weathercode ? weatherData.daily.weathercode[index] : 0)}
                         </div>
                         <div className="flex justify-between text-sm">
                           <span className="text-red-500 font-bold">
@@ -302,7 +275,7 @@ function Home() {
                             </p>
                             <div className="my-2 flex justify-center">
                               {getWeatherIcon(
-                                weatherData.hourly.weathercode[index]
+                                weatherData.hourly.weathercode ? weatherData.hourly.weathercode[index] : 0
                               )}
                             </div>
                             <p className="text-lg font-bold text-blue-800">
