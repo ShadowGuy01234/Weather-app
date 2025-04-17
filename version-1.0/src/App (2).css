@@ -1,0 +1,10 @@
+/* src/App.css or src/index.css */
+body {
+  font-family: sans-serif;
+  margin: 0;
+  background-color: #5d9bd4; /* Light Blue for the body */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
