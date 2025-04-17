@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+/* eslint-disable no-unused-vars */
+import React, { useEffect, useState } from "react";
 import SearchInput from "../components/SearchInput";
 import Navbar from "../components/Navbar";
 import axios from "axios";
+import "../App.css";
 import {
   WiDaySunny,
   WiRain,
@@ -73,6 +75,56 @@ function Home() {
     };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
+
+  useEffect(() => {
+    const getCurrentLocation = () => {
+      if (!navigator.geolocation) {
+        setError("Geolocation is not supported by your browser.");
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+          try {
+            // Get location name
+            const res = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
+            );
+            const data = await res.json();
+            const city =
+              data.address.city ||
+              data.address.town ||
+              data.address.village ||
+              data.display_name;
+            console.log(data);
+
+            // Get timezone
+            const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+            const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m,precipitation,weathercode,wind_speed_10m&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_sum&timezone=auto`;
+
+            const response = await axios.get(weatherUrl);
+            console.log(response);
+
+            setWeatherData({
+              location: city,
+              timezone: tz,
+              daily: response.data.daily,
+              hourly: response.data.hourly,
+            });
+          } catch (error) {
+            setError("Could not fetch weather for current location.");
+          }
+        },
+        (error) => {
+          setError("Location access denied or unavailable.");
+        }
+      );
+    };
+
+    getCurrentLocation();
+  }, []);
 
   const getWeatherIcon = (weatherCode) => {
     // Simplified weather code interpretation
@@ -233,14 +285,14 @@ function Home() {
                   <div className="bg-gradient-to-r from-blue-600 to-blue-800 p-4 text-white">
                     <h3 className="text-xl font-semibold">24-Hour Forecast</h3>
                   </div>
-                  <div className="p-4 overflow-x-auto">
+                  <div className="p-4 overflow-x-auto custom-scroll-hide">
                     <div className="flex space-x-4 pb-4">
                       {weatherData.hourly.time
                         .slice(0, 24)
                         .map((time, index) => (
                           <div
                             key={index}
-                            className="flex-shrink-0 w-24 bg-blue-50 rounded-lg p-3 text-center"
+                            className="flex-shrink-0 w-28 bg-blue-50 rounded-lg p-3 text-center"
                           >
                             <p className="font-medium text-blue-800">
                               {new Date(time).toLocaleTimeString([], {
