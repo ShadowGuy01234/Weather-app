@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import "../App.css";
@@ -27,9 +28,11 @@ function Home() {
     setError(null);
 
     try {
-      const response = await fetch(`http://localhost:3032/api/weather?city=${encodeURIComponent(cityName)}`);
+      const response = await fetch(
+        `http://localhost:3032/api/weather?city=${encodeURIComponent(cityName)}`
+      );
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(data.error || "Failed to fetch weather data");
       }
@@ -72,7 +75,7 @@ function Home() {
         async (position) => {
           try {
             const { latitude, longitude } = position.coords;
-            
+
             // Get location name
             const res = await fetch(
               `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
@@ -83,7 +86,7 @@ function Home() {
               data.address.town ||
               data.address.village ||
               data.display_name;
-            
+
             // Fetch weather using the detected city name
             fetchWeather(detectedCity);
           } catch (error) {
@@ -194,7 +197,11 @@ function Home() {
                       </p>
                     </div>
                     <div className="text-right">
-                      {getWeatherIcon(weatherData.daily.weathercode ? weatherData.daily.weathercode[0] : 0)}
+                      {getWeatherIcon(
+                        weatherData.daily.weathercode
+                          ? weatherData.daily.weathercode[0]
+                          : 0
+                      )}
                       <p className="capitalize text-blue-800">
                         {weatherData.daily.precipitation_sum[0] > 0
                           ? "Rainy"
@@ -221,7 +228,11 @@ function Home() {
                           {formatDate(date)}
                         </p>
                         <div className="my-2 flex justify-center">
-                          {getWeatherIcon(weatherData.daily.weathercode ? weatherData.daily.weathercode[index] : 0)}
+                          {getWeatherIcon(
+                            weatherData.daily.weathercode
+                              ? weatherData.daily.weathercode[index]
+                              : 0
+                          )}
                         </div>
                         <div className="flex justify-between text-sm">
                           <span className="text-red-500 font-bold">
@@ -275,7 +286,9 @@ function Home() {
                             </p>
                             <div className="my-2 flex justify-center">
                               {getWeatherIcon(
-                                weatherData.hourly.weathercode ? weatherData.hourly.weathercode[index] : 0
+                                weatherData.hourly.weathercode
+                                  ? weatherData.hourly.weathercode[index]
+                                  : 0
                               )}
                             </div>
                             <p className="text-lg font-bold text-blue-800">
