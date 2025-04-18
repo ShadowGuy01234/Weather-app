@@ -132,8 +132,8 @@ const AboutUs = () => {
             {" "}
             We value your feedback and are here to assist you.
             <p>Madan Mohan Malaviya University of Technology</p>
-            <p>Contact Details - +91-8765783730</p>
-            <p>Email Details - admission2024@mmmut.ac.in</p>
+            <p>Contact Details - +91-1122334455</p>
+            <p>Email Details - dummyemail@gmail.com</p>
           </p>
         </section>
       </div>
