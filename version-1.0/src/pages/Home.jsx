@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import "../App.css";
@@ -178,140 +177,143 @@ function Home() {
             </div>
           )}
 
-          {weatherData && (
-            <div className="space-y-8">
-              {/* Location Card */}
-              <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-                <div className="bg-gradient-to-r from-blue-600 to-blue-800 p-6 text-white">
-                  <h2 className="text-2xl font-bold">{weatherData.location}</h2>
-                  <p className="opacity-90">{weatherData.timezone}</p>
-                </div>
-                <div className="p-6">
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <p className="text-5xl font-bold text-blue-800">
-                        {weatherData.daily.temperature_2m_max[0]}°C
-                      </p>
-                      <p className="text-blue-600">
-                        {formatDate(weatherData.daily.time[0])}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      {getWeatherIcon(
-                        weatherData.daily.weathercode
-                          ? weatherData.daily.weathercode[0]
-                          : 0
-                      )}
-                      <p className="capitalize text-blue-800">
-                        {weatherData.daily.precipitation_sum[0] > 0
-                          ? "Rainy"
-                          : "Clear"}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+{weatherData && (
+  <div className="space-y-8">
+    {/* Location Card */}
+    <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+      <div className="bg-gradient-to-r from-blue-600 to-blue-800 p-6 text-white">
+        <h2 className="text-2xl font-bold">{weatherData.location}</h2>
+        <p className="opacity-90">{weatherData.timezone}</p>
+      </div>
+      <div className="p-6">
+        <div className="flex justify-between items-center">
+          <div>
+            <p className="text-5xl font-bold text-blue-800">
+              {
+                weatherData.hourly.temperature_2m[
+                  weatherData.hourly.time.findIndex(
+                    (t) =>
+                      new Date(t).getHours() === new Date().getHours() &&
+                      new Date(t).getDate() === new Date().getDate()
+                  )
+                ]
+              }
+              °C
+            </p>
+            <p className="text-blue-600">
+              {formatDate(weatherData.daily.time[0])}
+            </p>
+          </div>
+          <div className="text-right">
+            {getWeatherIcon(
+              weatherData.daily.weathercode
+                ? weatherData.daily.weathercode[0]
+                : 0
+            )}
+            <p className="capitalize text-blue-800">
+              {weatherData.daily.precipitation_sum[0] > 0 ? "Rainy" : "Clear"}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
 
-              {/* Daily Forecast */}
-              <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-                <div className="bg-gradient-to-r from-blue-600 to-blue-800 p-4 text-white">
-                  <h3 className="text-xl font-semibold">7-Day Forecast</h3>
-                </div>
-                <div className="p-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-4">
-                    {weatherData.daily.time.map((date, index) => (
-                      <div
-                        key={date}
-                        className="bg-blue-50 rounded-lg p-4 text-center hover:shadow-md transition-shadow"
-                      >
-                        <p className="font-medium text-blue-800">
-                          {formatDate(date)}
-                        </p>
-                        <div className="my-2 flex justify-center">
-                          {getWeatherIcon(
-                            weatherData.daily.weathercode
-                              ? weatherData.daily.weathercode[index]
-                              : 0
-                          )}
-                        </div>
-                        <div className="flex justify-between text-sm">
-                          <span className="text-red-500 font-bold">
-                            {weatherData.daily.temperature_2m_max[index]}°
-                          </span>
-                          <span className="text-blue-500 font-bold">
-                            {weatherData.daily.temperature_2m_min[index]}°
-                          </span>
-                        </div>
-                        <p className="text-xs mt-1 text-blue-600">
-                          Precip: {weatherData.daily.precipitation_sum[index]}mm
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+    {/* Daily Forecast */}
+    <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+      <div className="bg-gradient-to-r from-blue-600 to-blue-800 p-4 text-white">
+        <h3 className="text-xl font-semibold">7-Day Forecast</h3>
+      </div>
+      <div className="p-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-7 gap-4">
+          {weatherData.daily.time.map((date, index) => (
+            <div
+              key={date}
+              className="bg-blue-50 rounded-lg p-4 text-center hover:shadow-md transition-shadow"
+            >
+              <p className="font-medium text-blue-800">
+                {formatDate(date)}
+              </p>
+              <div className="my-2 flex justify-center">
+                {getWeatherIcon(
+                  weatherData.daily.weathercode
+                    ? weatherData.daily.weathercode[index]
+                    : 0
+                )}
               </div>
-
-              {/* Hourly Forecast Toggle */}
-              <div className="text-center">
-                <button
-                  onClick={() => setShowHourly(!showHourly)}
-                  className="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors duration-300 shadow-md"
-                >
-                  {showHourly
-                    ? "Hide Hourly Forecast"
-                    : "Show 24-Hour Forecast"}
-                </button>
+              <div className="flex justify-between text-sm">
+                <span className="text-red-500 font-bold">
+                  {weatherData.daily.temperature_2m_max[index]}°
+                </span>
+                <span className="text-blue-500 font-bold">
+                  {weatherData.daily.temperature_2m_min[index]}°
+                </span>
               </div>
-
-              {/* Hourly Forecast */}
-              {showHourly && weatherData.hourly && (
-                <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-                  <div className="bg-gradient-to-r from-blue-600 to-blue-800 p-4 text-white">
-                    <h3 className="text-xl font-semibold">24-Hour Forecast</h3>
-                  </div>
-                  <div className="p-4 overflow-x-auto custom-scroll-hide">
-                    <div className="flex space-x-4 pb-4">
-                      {weatherData.hourly.time
-                        .slice(0, 24)
-                        .map((time, index) => (
-                          <div
-                            key={index}
-                            className="flex-shrink-0 w-28 bg-blue-50 rounded-lg p-3 text-center"
-                          >
-                            <p className="font-medium text-blue-800">
-                              {new Date(time).toLocaleTimeString([], {
-                                hour: "2-digit",
-                                hour12: true,
-                              })}
-                            </p>
-                            <div className="my-2 flex justify-center">
-                              {getWeatherIcon(
-                                weatherData.hourly.weathercode
-                                  ? weatherData.hourly.weathercode[index]
-                                  : 0
-                              )}
-                            </div>
-                            <p className="text-lg font-bold text-blue-800">
-                              {weatherData.hourly.temperature_2m[index]}°
-                            </p>
-                            <div className="flex justify-between text-xs mt-1">
-                              <span className="text-blue-600">
-                                <span className="block">Rain</span>
-                                {weatherData.hourly.precipitation[index]}mm
-                              </span>
-                              <span className="text-blue-600">
-                                <span className="block">Wind</span>
-                                {weatherData.hourly.wind_speed_10m[index]}km/h
-                              </span>
-                            </div>
-                          </div>
-                        ))}
-                    </div>
-                  </div>
-                </div>
-              )}
+              <p className="text-xs mt-1 text-blue-600">
+                Precip: {weatherData.daily.precipitation_sum[index]}mm
+              </p>
             </div>
-          )}
+          ))}
+        </div>
+      </div>
+    </div>
+
+    {/* Hourly Forecast Toggle */}
+    <div className="text-center">
+      <button
+        onClick={() => setShowHourly(!showHourly)}
+        className="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors duration-300 shadow-md"
+      >
+        {showHourly ? "Hide Hourly Forecast" : "Show 24-Hour Forecast"}
+      </button>
+    </div>
+
+    {/* Hourly Forecast */}
+    {showHourly && weatherData.hourly && (
+      <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+        <div className="bg-gradient-to-r from-blue-600 to-blue-800 p-4 text-white">
+          <h3 className="text-xl font-semibold">24-Hour Forecast</h3>
+        </div>
+        <div className="p-4 overflow-x-auto custom-scroll-hide">
+          <div className="flex space-x-4 pb-4">
+            {weatherData.hourly.time.slice(0, 24).map((time, index) => (
+              <div
+                key={index}
+                className="flex-shrink-0 w-28 bg-blue-50 rounded-lg p-3 text-center"
+              >
+                <p className="font-medium text-blue-800">
+                  {new Date(time).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    hour12: true,
+                  })}
+                </p>
+                <div className="my-2 flex justify-center">
+                  {getWeatherIcon(
+                    weatherData.hourly.weathercode
+                      ? weatherData.hourly.weathercode[index]
+                      : 0
+                  )}
+                </div>
+                <p className="text-lg font-bold text-blue-800">
+                  {weatherData.hourly.temperature_2m[index]}°
+                </p>
+                <div className="flex justify-between text-xs mt-1">
+                  <span className="text-blue-600">
+                    <span className="block">Rain</span>
+                    {weatherData.hourly.precipitation[index]}mm
+                  </span>
+                  <span className="text-blue-600">
+                    <span className="block">Wind</span>
+                    {weatherData.hourly.wind_speed_10m[index]}km/h
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    )}
+  </div>
+)}
         </div>
       </div>
     </>
