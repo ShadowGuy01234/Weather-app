@@ -190,7 +190,17 @@ function Home() {
                   <div className="flex justify-between items-center">
                     <div>
                       <p className="text-5xl font-bold text-blue-800">
-                        {weatherData.daily.temperature_2m_max[0]}°C
+                        {
+                          weatherData.hourly.temperature_2m[
+                            weatherData.hourly.time.findIndex(
+                              (t) =>
+                                new Date(t).getHours() ===
+                                  new Date().getHours() &&
+                                new Date(t).getDate() === new Date().getDate()
+                            )
+                          ]
+                        }
+                        °C
                       </p>
                       <p className="text-blue-600">
                         {formatDate(weatherData.daily.time[0])}
