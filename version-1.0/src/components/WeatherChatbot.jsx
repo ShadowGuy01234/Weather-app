@@ -9,9 +9,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const WeatherChatbot = () => {
   // Initialize Gemini
-  const genAI = new GoogleGenerativeAI(
-    import.meta.env.REACT_APP_GEMINI_API_KEY
-  );
+  const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
   const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
   const [isOpen, setIsOpen] = useState(false);
