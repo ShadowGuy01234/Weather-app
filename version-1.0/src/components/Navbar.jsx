@@ -1,5 +1,4 @@
-/* eslint-disable no-unused-vars */
-// Navbar.js
+
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiSearch, FiX, FiMenu } from "react-icons/fi";
@@ -24,14 +23,12 @@ function Navbar() {
       >
         <div className="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            {/* Logo */}
             <div className="flex-shrink-0 flex items-center">
               <span className="ml-2 text-white text-2xl font-bold">
                 WeatherPro
               </span>
             </div>
 
-            {/* Desktop Navigation */}
             <div className="hidden lg:flex items-center space-x-8">
               <div className="flex space-x-6">
                 {navItems.map((item) => (
@@ -46,7 +43,6 @@ function Navbar() {
               </div>
             </div>
 
-            {/* Mobile menu button */}
             <div className="lg:hidden flex items-center">
               <a
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -62,7 +58,6 @@ function Navbar() {
           </div>
         </div>
 
-        {/* Mobile menu */}
         <AnimatePresence>
           {mobileMenuOpen && (
             <motion.div
