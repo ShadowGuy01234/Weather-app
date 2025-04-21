@@ -8,14 +8,15 @@ dotenv.config();
 app.use(cors());
 app.use(express.json());
 
+const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173/";
+
 const PORT = process.env.PORT || 3000;
 // Configure CORS
-const corsOptions = {
-    origin: process.env.FRONTEND_URL, // Allow all origins
-    methods: ["GET", "POST", "PUT", "DELETE"], // Allowed methods
-    allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
-};
-app.use(cors(corsOptions));
+app.use(cors({
+    origin: FRONTEND_URL,
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['Content-Type']
+}));
 
 app.get("/", (req, res) => {
     res.send("Hello from server");
@@ -136,4 +137,6 @@ app.get("/api/news", async (req, res) => {
     }
 });
 
-app.listen(PORT);
+app.listen(PORT, () => {
+    console.log(`Server is running on port http://localhost:${PORT}`);
+});
