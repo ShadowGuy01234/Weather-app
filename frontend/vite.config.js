@@ -1,4 +1,4 @@
-
+/* eslint-disable no-undef */
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from "@tailwindcss/vite";
@@ -13,8 +13,9 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://weather-pro-backend.vercel.app/',
-        changeOrigin: true
+        target: process.env.VITE_BACKEND_URL || 'https://weather-pro-backend.vercel.app',
+        changeOrigin: true,
+        rewrite: (path) => path
       }
     }
   }
