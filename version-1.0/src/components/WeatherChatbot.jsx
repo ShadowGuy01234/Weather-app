@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { WiDaySunny, WiRain } from "react-icons/wi";
@@ -8,8 +7,9 @@ import { IoMdSend } from "react-icons/io";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const WeatherChatbot = () => {
-  // Initialize Gemini
-  const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
+  const genAI = new GoogleGenerativeAI(
+    import.meta.env.VITE_GEMINI_API_KEY
+  );
   const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
   const [isOpen, setIsOpen] = useState(false);
@@ -24,7 +24,6 @@ const WeatherChatbot = () => {
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef(null);
 
-  // Auto-scroll to bottom when messages change
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
@@ -37,14 +36,12 @@ const WeatherChatbot = () => {
     e.preventDefault();
     if (!message.trim() || isLoading) return;
 
-    // Add user message
     const userMessage = { id: Date.now(), text: message, sender: "user" };
     setMessages((prev) => [...prev, userMessage]);
     setMessage("");
     setIsLoading(true);
 
     try {
-      // Generate weather-focused response
       const prompt = `As a professional weather assistant, provide a concise, accurate response to this weather-related query: "${message}". 
       If it's not weather-related, politely explain you specialize in weather information.`;
 

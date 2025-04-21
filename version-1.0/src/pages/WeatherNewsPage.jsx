@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { WiRain, WiDaySunny, WiSnow, WiThunderstorm } from "react-icons/wi";
@@ -22,27 +21,13 @@ const WeatherNewsPage = () => {
     { id: "global", name: "Global Events" },
   ];
 
-  // Map categories to API query keywords and icons
-  const categoryConfig = {
-    extreme: {
-      query: "extreme weather",
-      icon: <WiThunderstorm className="text-4xl text-purple-500" />,
-    },
-    climate: {
-      query: "climate change",
-      icon: <WiSnow className="text-4xl text-blue-200" />,
-    },
-    research: {
-      query: "weather research",
-      icon: <WiDaySunny className="text-4xl text-blue-400" />,
-    },
-    global: {
-      query: "global weather events",
-      icon: <WiRain className="text-4xl text-blue-600" />,
-    },
+  const categoryIcons = {
+    extreme: <WiThunderstorm className="text-4xl text-purple-500" />,
+    climate: <WiSnow className="text-4xl text-blue-200" />,
+    research: <WiDaySunny className="text-4xl text-blue-400" />,
+    global: <WiRain className="text-4xl text-blue-600" />,
   };
 
-  // Fetch news articles
   const fetchNews = async (category = "all", page = null, append = false) => {
     if (!append) {
       setLoading(true);
@@ -50,71 +35,50 @@ const WeatherNewsPage = () => {
       setLoadingMore(true);
     }
     setError(null);
-    const apiKey = import.meta.env.VITE_NEWS_API_KEY;
-    const baseUrl = "https://newsdata.io/api/1/news";
-    let articles = append ? [...newsArticles] : [];
 
     try {
-      const categoriesToFetch =
-        category === "all" ? Object.keys(categoryConfig) : [category];
-
-      for (const cat of categoriesToFetch) {
-        const config = categoryConfig[cat];
-        const url = page
-          ? `${baseUrl}?apikey=${apiKey}&q=${encodeURIComponent(
-              config.query
-            )}&language=en&page=${page}`
-          : `${baseUrl}?apikey=${apiKey}&q=${encodeURIComponent(
-              config.query
-            )}&language=en`;
-
-        const response = await fetch(url);
-        if (!response.ok) {
-          throw new Error(`Failed to fetch news for ${cat}`);
-        }
-        const data = await response.json();
-        if (data.status === "success" && data.results) {
-          const mappedArticles = data.results.map((article, index) => ({
-            id: `${cat}-${Date.now()}-${index}`,
-            title: article.title || "Untitled Article",
-            excerpt:
-              article.description ||
-              article.content?.substring(0, 100) ||
-              "No description available",
-            category: cat,
-            date: article.pubDate
-              ? new Date(article.pubDate).toISOString().split("T")[0]
-              : "Unknown",
-            icon: config.icon,
-            url: article.link || "#",
-            image: article.image_url || "https://via.placeholder.com/150",
-          }));
-          articles.push(...mappedArticles);
-          setNextPage((prev) => ({ ...prev, [cat]: data.nextPage }));
-          if (!data.nextPage) {
-            setHasMore(false);
-          }
-        }
+      const baseUrl = "http://localhost:3032/api/news";
+      const url = new URL(baseUrl);
+      url.searchParams.append("category", category);
+      if (page) {
+        url.searchParams.append("page", page);
       }
-      setNewsArticles(articles);
+
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error("Failed to fetch news");
+      }
+      
+      const data = await response.json();
+      
+      const articlesWithIcons = data.articles.map(article => ({
+        ...article,
+        icon: categoryIcons[article.category]
+      }));
+      
+      if (append) {
+        setNewsArticles(prev => [...prev, ...articlesWithIcons]);
+      } else {
+        setNewsArticles(articlesWithIcons);
+      }
+      
+      setNextPage(data.nextPage);
+      
+      const hasNextPage = Object.keys(data.nextPage || {}).length > 0;
+      setHasMore(hasNextPage);
     } catch (err) {
       setError("Failed to load news articles. Please try again later.");
       console.error(err);
     } finally {
-      if (!append) {
-        setLoading(false);
-      } else {
-        setLoadingMore(false);
-      }
+      setLoading(false);
+      setLoadingMore(false);
     }
   };
 
-  // Initial fetch
   useEffect(() => {
     fetchNews("all");
   }, []);
 
-  // Refetch when category changes
   useEffect(() => {
     setNewsArticles([]);
     setNextPage({});
@@ -122,7 +86,6 @@ const WeatherNewsPage = () => {
     fetchNews(activeCategory);
   }, [activeCategory]);
 
-  // Infinite scrolling with Intersection Observer
   useEffect(() => {
     if (!hasMore || loading || loadingMore) return;
 
@@ -176,7 +139,6 @@ const WeatherNewsPage = () => {
           </p>
         </motion.header>
 
-        {/* Category Filters */}
         <motion.div
           className="flex flex-wrap justify-center gap-3 mb-12"
           initial={{ opacity: 0 }}
@@ -200,7 +162,6 @@ const WeatherNewsPage = () => {
           ))}
         </motion.div>
 
-        {/* Loading and Error States */}
         {loading && (
           <motion.div
             className="text-center text-blue-600"
@@ -220,7 +181,6 @@ const WeatherNewsPage = () => {
           </motion.div>
         )}
 
-        {/* News Grid */}
         {!loading && !error && (
           <motion.div
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
@@ -291,7 +251,6 @@ const WeatherNewsPage = () => {
           </motion.div>
         )}
 
-        {/* Infinite Scroll Trigger */}
         {loadingMore && (
           <motion.div
             className="text-center text-blue-600 mt-6"
