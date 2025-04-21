@@ -18,7 +18,7 @@ export default function useWeather() {
 
     try {
       const response = await fetch(
-        `http://localhost:3032/api/weather?city=${encodeURIComponent(cityName)}`
+        `https://weather-app-backend-murex.vercel.app/api/weather?city=${encodeURIComponent(cityName)}`
       );
 
       const data = await response.json();

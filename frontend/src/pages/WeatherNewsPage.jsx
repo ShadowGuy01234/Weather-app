@@ -37,7 +37,7 @@ const WeatherNewsPage = () => {
     setError(null);
 
     try {
-      const baseUrl = "http://localhost:3032/api/news";
+      const baseUrl = "https://weather-app-backend-murex.vercel.app/api/news";
       const url = new URL(baseUrl);
       url.searchParams.append("category", category);
       if (page) {
