@@ -194,6 +194,7 @@ const WeatherChatbot = () => {
                 />
                 <a
                   type="submit"
+                  onClick={handleSendMessage}
                   disabled={isLoading || !message.trim()}
                   className="bg-blue-600 text-white mx-1 p-3 rounded-r-lg hover:bg-blue-700 transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                 >

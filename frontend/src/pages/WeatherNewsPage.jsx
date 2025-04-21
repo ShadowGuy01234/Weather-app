@@ -38,8 +38,8 @@ const WeatherNewsPage = () => {
     setError(null);
 
     try {
-      const baseUrl = `${import.meta.env.VITE_BACKEND_URL}/api/news`;
-      // const baseUrl = "http://localhost:3000/api/news";
+      // const baseUrl = `${import.meta.env.VITE_BACKEND_URL}/api/news`;
+      const baseUrl = "https://weather-pro-backend.vercel.app/";
       const url = new URL(baseUrl);
       url.searchParams.append("category", category);
       if (page) {
