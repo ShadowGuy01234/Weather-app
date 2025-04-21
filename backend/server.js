@@ -8,7 +8,7 @@ dotenv.config();
 app.use(cors());
 app.use(express.json());
 
-const PORT = process.env.PORT || 3032;
+const PORT = process.env.PORT || 3000;
 // Configure CORS
 const corsOptions = {
     origin: process.env.FRONTEND_URL, // Allow all origins
