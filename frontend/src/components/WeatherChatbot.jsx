@@ -1,16 +1,11 @@
-/* eslint-disable no-unused-vars */
 import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { WiDaySunny, WiRain } from "react-icons/wi";
+import { WiDaySunny } from "react-icons/wi";
 import { FaTimes } from "react-icons/fa";
 import { MdOutlineMarkChatRead } from "react-icons/md";
 import { IoMdSend } from "react-icons/io";
-import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const WeatherChatbot = () => {
-  const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([
@@ -41,23 +36,26 @@ const WeatherChatbot = () => {
     setIsLoading(true);
 
     try {
-      const prompt = `As a professional weather assistant, provide a concise, accurate response to this weather-related query: "${message}". 
-      If it's not weather-related, politely explain you specialize in weather information.`;
+      const res = await fetch("https://weather-app-backend-774123782107.us-central1.run.app/api/gemini", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ message }),
+      });
 
-      const result = await model.generateContent(prompt);
-      const response = await result.response;
-      const text = response.text();
+      const data = await res.json();
 
       setMessages((prev) => [
         ...prev,
         {
           id: Date.now() + 1,
-          text: text,
+          text: data.reply || "Sorry, I couldn't find an answer.",
           sender: "bot",
         },
       ]);
     } catch (error) {
-      console.error("Gemini API error:", error);
+      console.error("Gemini backend error:", error);
       setMessages((prev) => [
         ...prev,
         {
@@ -73,15 +71,13 @@ const WeatherChatbot = () => {
 
   return (
     <>
-      {/* Floating Action a */}
+      {/* Floating Button */}
       <motion.a
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setIsOpen(!isOpen)}
         className="fixed bottom-6 right-6 z-50 bg-gradient-to-br from-blue-600 to-blue-500 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50"
-        aria-label={
-          isOpen ? "Close weather assistant" : "Open weather assistant"
-        }
+        aria-label={isOpen ? "Close weather assistant" : "Open weather assistant"}
       >
         {isOpen ? (
           <FaTimes className="h-5 w-5" />
@@ -124,22 +120,11 @@ const WeatherChatbot = () => {
             </div>
 
             {/* Chat Messages */}
-            <div
-              className="h-72 p-4 overflow-y-auto bg-gray-50"
-              style={{
-                scrollbarWidth: "none",
-                msOverflowStyle: "none",
-              }}
-            >
+            <div className="h-72 p-4 overflow-y-auto bg-gray-50" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
               <style>{`.overflow-y-auto::-webkit-scrollbar { display: none; }`}</style>
 
               {messages.map((msg) => (
-                <div
-                  key={msg.id}
-                  className={`mb-3 flex ${
-                    msg.sender === "user" ? "justify-end" : "justify-start"
-                  }`}
-                >
+                <div key={msg.id} className={`mb-3 flex ${msg.sender === "user" ? "justify-end" : "justify-start"}`}>
                   <motion.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -159,18 +144,9 @@ const WeatherChatbot = () => {
                 <div className="flex justify-start mb-3">
                   <div className="bg-white text-gray-800 rounded-bl-none shadow-xs border border-gray-100 px-3 py-2 rounded-lg max-w-[85%]">
                     <div className="flex space-x-1.5">
-                      <div
-                        className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce"
-                        style={{ animationDelay: "0ms" }}
-                      ></div>
-                      <div
-                        className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce"
-                        style={{ animationDelay: "150ms" }}
-                      ></div>
-                      <div
-                        className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce"
-                        style={{ animationDelay: "300ms" }}
-                      ></div>
+                      <div className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: "0ms" }}></div>
+                      <div className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: "150ms" }}></div>
+                      <div className="w-1.5 h-1.5 rounded-full bg-gray-400 animate-bounce" style={{ animationDelay: "300ms" }}></div>
                     </div>
                   </div>
                 </div>
@@ -178,11 +154,8 @@ const WeatherChatbot = () => {
               <div ref={messagesEndRef} />
             </div>
 
-            {/* Message Input */}
-            <form
-              onSubmit={handleSendMessage}
-              className="p-3 border-t border-gray-200 bg-white "
-            >
+            {/* Input */}
+            <form onSubmit={handleSendMessage} className="p-3 border-t border-gray-200 bg-white">
               <div className="flex items-center lg:rounded-lg bg-gray-100 shadow-sm w-full justify-between">
                 <input
                   type="text"
@@ -192,13 +165,13 @@ const WeatherChatbot = () => {
                   disabled={isLoading}
                   className="flex-1 w-full px-4 py-2 rounded-l-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
-                <a
+                <button
                   type="submit"
                   disabled={isLoading || !message.trim()}
                   className="bg-blue-600 text-white mx-1 p-3 rounded-r-lg hover:bg-blue-700 transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <IoMdSend className="h-5 w-5" />
-                </a>
+                </button>
               </div>
             </form>
           </motion.div>
