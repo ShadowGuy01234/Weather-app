@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { WiRain, WiDaySunny, WiSnow, WiThunderstorm } from "react-icons/wi";
@@ -37,7 +38,8 @@ const WeatherNewsPage = () => {
     setError(null);
 
     try {
-      const baseUrl = "https://weather-app-backend-murex.vercel.app/api/news";
+      const baseUrl = `${import.meta.env.VITE_BACKEND_URL}/api/news`;
+      // const baseUrl = "http://localhost:3000/api/news";
       const url = new URL(baseUrl);
       url.searchParams.append("category", category);
       if (page) {
@@ -45,25 +47,27 @@ const WeatherNewsPage = () => {
       }
 
       const response = await fetch(url);
+      console.log(response);
+
       if (!response.ok) {
         throw new Error("Failed to fetch news");
       }
-      
+
       const data = await response.json();
-      
-      const articlesWithIcons = data.articles.map(article => ({
+
+      const articlesWithIcons = data.articles.map((article) => ({
         ...article,
-        icon: categoryIcons[article.category]
+        icon: categoryIcons[article.category],
       }));
-      
+
       if (append) {
-        setNewsArticles(prev => [...prev, ...articlesWithIcons]);
+        setNewsArticles((prev) => [...prev, ...articlesWithIcons]);
       } else {
         setNewsArticles(articlesWithIcons);
       }
-      
+
       setNextPage(data.nextPage);
-      
+
       const hasNextPage = Object.keys(data.nextPage || {}).length > 0;
       setHasMore(hasNextPage);
     } catch (err) {

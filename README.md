@@ -46,6 +46,48 @@ WeatherPro delivers accurate weather predictions and forecasts for any location 
   - NewsData.io
   - Google Generative AI (Gemini)
 
+## 📁 Project Structure
+
+```
+Weather-app/
+├── frontend/                  # React frontend application
+│   ├── public/                # Static files
+│   ├── src/                   # Source files
+│   │   ├── assets/            # Images and static assets
+│   │   ├── components/        # Reusable React components
+│   │   │   ├── Navbar.jsx     # Navigation component
+│   │   │   ├── Footer.jsx     # Footer component
+│   │   │   ├── SearchInput.jsx # Weather search input
+│   │   │   ├── WeatherChatbot.jsx # Gemini AI chatbot component
+│   │   │   └── ...
+│   │   ├── hooks/             # Custom React hooks
+│   │   │   └── useWeather.js  # Weather data fetching hook
+│   │   ├── pages/             # Application pages/routes
+│   │   │   ├── Home.jsx       # Main weather dashboard
+│   │   │   ├── About.jsx      # About page
+│   │   │   ├── Features.jsx   # Features showcase page
+│   │   │   └── WeatherNewsPage.jsx # Weather news page
+│   │   ├── App.jsx            # Main application component
+│   │   ├── App.css            # Global application styles
+│   │   ├── main.jsx           # Application entry point
+│   │   └── index.css          # Base styles (imports Tailwind)
+│   ├── .env                   # Environment variables for frontend
+│   ├── index.html             # HTML entry point
+│   ├── vite.config.js         # Vite configuration
+│   ├── eslint.config.js       # ESLint configuration
+│   └── package.json           # Frontend dependencies
+│
+├── backend/                   # Express backend server
+│   ├── server.js              # Main server file
+│   ├── .env                   # Environment variables for backend
+│   ├── vercel.json            # Vercel deployment configuration
+│   └── package.json           # Backend dependencies
+│
+├── .gitignore                 # Git ignore file
+├── LICENSE                    # MIT License
+└── README.md                  # Project documentation
+```
+
 ## 🚀 Installation
 
 ### Clone the repository
