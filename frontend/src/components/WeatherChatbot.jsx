@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { WiDaySunny, WiRain } from "react-icons/wi";
@@ -7,9 +8,7 @@ import { IoMdSend } from "react-icons/io";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const WeatherChatbot = () => {
-  const genAI = new GoogleGenerativeAI(
-    import.meta.env.VITE_GEMINI_API_KEY
-  );
+  const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
   const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
   const [isOpen, setIsOpen] = useState(false);
@@ -182,23 +181,23 @@ const WeatherChatbot = () => {
             {/* Message Input */}
             <form
               onSubmit={handleSendMessage}
-              className="p-3 border-t border-gray-200 bg-white"
+              className="p-3 border-t border-gray-200 bg-white "
             >
-              <div className="flex items-center lg:rounded-lg bg-gray-100 shadow-sm">
+              <div className="flex items-center lg:rounded-lg bg-gray-100 shadow-sm w-full justify-between">
                 <input
                   type="text"
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
                   placeholder="Ask about weather..."
-                  className="flex-grow px-3 py-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 text-sm "
                   disabled={isLoading}
+                  className="flex-1 w-full px-4 py-2 rounded-l-lg bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
                 <a
                   type="submit"
                   disabled={isLoading || !message.trim()}
                   className="bg-blue-600 text-white mx-1 p-3 rounded-r-lg hover:bg-blue-700 transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <IoMdSend className="h-4 w-4" />
+                  <IoMdSend className="h-5 w-5" />
                 </a>
               </div>
             </form>
