@@ -130,8 +130,8 @@ app.get("/api/news", async (req, res) => {
     }
 });
 
-const gemini = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = gemini.getGenerativeModel({ model: "gemini-pro" });
+const gemini = new GoogleGenerativeAI("AIzaSyBFjIIxhkvWk35f3vOKCtO3IDklvOme3Q4");
+const model = gemini.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 app.post("/api/gemini", async (req, res) => {
     const { message } = req.body;
