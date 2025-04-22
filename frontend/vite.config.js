@@ -6,17 +6,5 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineConfig({
   base: '/',
   plugins: [react(), tailwindcss()],
-  build: {
-    outDir: 'dist',
-    emptyOutDir: true
-  },
-  server: {
-    proxy: {
-      '/api': {
-        target: process.env.VITE_BACKEND_URL || 'https://weather-pro-backend.vercel.app',
-        changeOrigin: true,
-        rewrite: (path) => path
-      }
-    }
-  }
-})
+  base: '/',
+});

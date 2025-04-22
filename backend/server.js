@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import fetch from "node-fetch";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const app = express();
 dotenv.config();
@@ -137,6 +138,28 @@ app.get("/api/news", async (req, res) => {
     }
 });
 
-app.listen(PORT, () => {
-    console.log(`Server is running on port http://localhost:${PORT}`);
+const gemini = new GoogleGenerativeAI("AIzaSyBFjIIxhkvWk35f3vOKCtO3IDklvOme3Q4");
+const model = gemini.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+app.post("/api/gemini", async (req, res) => {
+    const { message } = req.body;
+
+    if (!message) {
+        return res.status(400).json({ error: "Message is required" });
+    }
+
+    try {
+        const prompt = `As a professional weather assistant, provide a concise, accurate response to this weather-related query: "${message}". If it's not weather-related, politely explain you specialize in weather information.`;
+
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const text = response.text();
+
+        res.json({ reply: text });
+    } catch (error) {
+        console.error("Gemini API error:", error.message);
+        res.status(500).json({ error: "Failed to generate response" });
+    }
 });
+
+app.listen(PORT);
