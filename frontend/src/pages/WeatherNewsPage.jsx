@@ -38,12 +38,8 @@ const WeatherNewsPage = () => {
     setError(null);
 
     try {
-<<<<<<< HEAD
-      // const baseUrl = `${import.meta.env.VITE_BACKEND_URL}/api/news`;
-      const baseUrl = "http://localhost:3000/api/news";
-=======
-      const baseUrl = "https://weather-app-backend-774123782107.us-central1.run.app/api/news";
->>>>>>> 0a4b8a1463794b854eacb9d245ab962774582546
+      const baseUrl =
+        "https://weather-app-backend-774123782107.us-central1.run.app/api/news";
       const url = new URL(baseUrl);
       url.searchParams.append("category", category);
       if (page) {
