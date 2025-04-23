@@ -4,6 +4,7 @@ import {
   Routes,
   Route,
   useLocation,
+  Link,
 } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import Home from "./pages/Home";
@@ -16,14 +17,12 @@ import WeatherChatbot from "./components/WeatherChatbot";
 
 function App() {
   return (
-    <>
+    <Router>
       <Navbar />
-      <Router>
-        <AnimatedRoutes />
-      </Router>
+      <AnimatedRoutes />
       <WeatherChatbot />
       <Footer />
-    </>
+    </Router>
   );
 }
 
