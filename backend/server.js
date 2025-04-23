@@ -9,7 +9,7 @@ dotenv.config();
 app.use(cors());
 app.use(express.json());
 
-const FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173/";
+const FRONTEND_URL = process.env.FRONTEND_URL || "https://weather-app-frontend-i64p.onrender.com/";
 
 const PORT = process.env.PORT || 3000;
 // Configure CORS
