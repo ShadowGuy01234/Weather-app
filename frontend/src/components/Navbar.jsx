@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiSearch, FiX, FiMenu } from "react-icons/fi";
@@ -8,7 +7,7 @@ function Navbar() {
 
   const navItems = [
     { name: "Home", path: "/" },
-    { name: "Weather News", path: "/news" },
+    { name: "News", path: "/news" },
     { name: "Features", path: "/features" },
     { name: "About", path: "/about" },
   ];
