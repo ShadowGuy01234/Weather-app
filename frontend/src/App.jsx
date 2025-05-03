@@ -12,7 +12,7 @@ import Home from "./pages/Home";
 import About from "./pages/About";
 import Features from "./pages/Features";
 import WeatherNewsPage from "./pages/WeatherNewsPage";
-import LoginForm from "./pages/Loginform";
+import LoginForm from "./pages/LoginForm";
 import SignUpForm from "./pages/SignUpForm";
 
 import Navbar from "./components/Navbar";
