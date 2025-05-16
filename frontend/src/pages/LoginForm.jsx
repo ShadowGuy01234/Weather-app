@@ -17,7 +17,7 @@ const LoginForm = () => {
     setError("");
 
     try {
-      const response = await fetch("http://localhost:3000/signin", {
+      const response = await fetch("https://weather-app-backend-774123782107.us-central1.run.app/signin", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

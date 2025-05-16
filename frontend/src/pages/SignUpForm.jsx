@@ -41,7 +41,7 @@ const SignUpForm = () => {
     try {
       setLoading(true);
       const response = await axios.post(
-        `http://localhost:3000/register`,
+        `https://weather-app-backend-774123782107.us-central1.run.app/register`,
         formData
       );
 
