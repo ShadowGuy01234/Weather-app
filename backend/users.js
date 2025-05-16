@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import bcrypt from "bcrypt";
 
 const userSchema = new mongoose.Schema({
   fullName: {
@@ -21,6 +22,11 @@ const userSchema = new mongoose.Schema({
     },
   },
 });
+
+// Add method to compare password
+userSchema.methods.comparePassword = async function (candidatePassword) {
+  return await bcrypt.compare(candidatePassword, this.password);
+};
 
 const userModel = mongoose.model("user", userSchema);
 

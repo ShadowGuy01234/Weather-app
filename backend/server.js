@@ -4,6 +4,8 @@ import dotenv from "dotenv";
 import fetch from "node-fetch";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import mongoose from "mongoose";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 import userModel from "./users.js";
 
@@ -34,11 +36,25 @@ app.get("/", (req, res) => {
   res.send("Hello from server");
 });
 
+// Add JWT middleware
+const verifyToken = (req, res, next) => {
+  const token = req.headers.authorization?.split(' ')[1];
+  if (!token) return res.status(401).json({ error: "Access denied" });
+
+  try {
+    const verified = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+    req.user = verified;
+    next();
+  } catch (error) {
+    res.status(400).json({ error: "Invalid token" });
+  }
+};
+
+// Modified register route
 app.post("/register", async (req, res) => {
   try {
     const { fullName, email, password, confirmPassword } = req.body;
 
-    // Basic validation
     if (!fullName || !email || !password || !confirmPassword) {
       return res.status(400).json({ message: "All fields are required" });
     }
@@ -47,22 +63,29 @@ app.post("/register", async (req, res) => {
       return res.status(400).json({ message: "Passwords do not match" });
     }
 
-    // Check if user already exists
     const existingUser = await userModel.findOne({ email });
     if (existingUser) {
-      return res
-        .status(400)
-        .json({ message: "User already exists with this email" });
+      return res.status(400).json({ message: "User already exists with this email" });
     }
 
-    // Create new user with plain password
+    // Hash password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
     const user = new userModel({
       fullName,
       email,
-      password,
+      password: hashedPassword,
     });
 
     await user.save();
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { id: user._id, email: user.email },
+      process.env.JWT_SECRET || 'your-secret-key',
+      { expiresIn: '24h' }
+    );
 
     res.status(201).json({
       message: "User registered successfully",
@@ -71,6 +94,7 @@ app.post("/register", async (req, res) => {
         fullName: user.fullName,
         email: user.email,
       },
+      token
     });
   } catch (error) {
     console.error("Registration error:", error);
@@ -78,29 +102,34 @@ app.post("/register", async (req, res) => {
   }
 });
 
+// Modified signin route
 app.post("/signin", async (req, res) => {
   try {
     const { email, password } = req.body;
-    
-    // Validate required fields
+
     if (!email || !password) {
       return res.status(400).json({ error: "Email and password are required" });
     }
-    
-    // Find user by email
+
     const user = await userModel.findOne({ email });
-    
-    // Check if user exists
+
     if (!user) {
       return res.status(401).json({ error: "Invalid credentials" });
     }
-    
+
     // Verify password
-    if (user.password !== password) {
+    const validPassword = await bcrypt.compare(password, user.password);
+    if (!validPassword) {
       return res.status(401).json({ error: "Invalid credentials" });
     }
-    
-    // Send success response
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { id: user._id, email: user.email },
+      process.env.JWT_SECRET || 'your-secret-key',
+      { expiresIn: '24h' }
+    );
+
     res.status(200).json({
       success: true,
       message: "Sign-in successful",
@@ -109,6 +138,7 @@ app.post("/signin", async (req, res) => {
         email: user.email,
         fullName: user.fullName
       },
+      token
     });
   } catch (error) {
     console.error("Sign-in error:", error.message);
@@ -192,11 +222,11 @@ app.get("/api/news", async (req, res) => {
       const baseUrl = "https://newsdata.io/api/1/news";
       const url = page
         ? `${baseUrl}?apikey=${apiKey}&q=${encodeURIComponent(
-            config.query
-          )}&language=en&page=${page}`
+          config.query
+        )}&language=en&page=${page}`
         : `${baseUrl}?apikey=${apiKey}&q=${encodeURIComponent(
-            config.query
-          )}&language=en`;
+          config.query
+        )}&language=en`;
 
       const response = await fetch(url);
       if (!response.ok) {
