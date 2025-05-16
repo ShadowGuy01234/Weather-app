@@ -1,14 +1,16 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useAuth } from "../context/AuthContext";
 
 const SignUpForm = () => {
+  const { login } = useAuth();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
     password: "",
-    confirmPassword: ""
+    confirmPassword: "",
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -17,43 +19,39 @@ const SignUpForm = () => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    
+
     // Basic validation
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match");
       return;
     }
-    
+
     if (formData.password.length < 6) {
       setError("Password must be at least 6 characters long");
       return;
     }
-    
+
     try {
       setLoading(true);
       const response = await axios.post(
-        `http://localhost:3000/register`, 
+        `http://localhost:3000/register`,
         formData
       );
-      
-      // Store user data in localStorage
-      localStorage.setItem("weatherwiseUser", JSON.stringify(response.data.user));
-      
-      // Show success message and redirect
+
+      // Pass both user data and token to login
+      login(response.data.user, response.data.token);
       alert("Registration successful!");
       navigate("/");
-      
     } catch (err) {
       setError(
-        err.response?.data?.message || 
-        "Registration failed. Please try again."
+        err.response?.data?.message || "Registration failed. Please try again."
       );
     } finally {
       setLoading(false);
@@ -66,7 +64,9 @@ const SignUpForm = () => {
         <div className="text-center mb-8">
           <div className="text-5xl mb-4">☁️</div>
           <h1 className="text-3xl font-bold text-blue-700">WeatherWise</h1>
-          <h2 className="text-xl font-bold text-blue-800 mt-2">Create your account</h2>
+          <h2 className="text-xl font-bold text-blue-800 mt-2">
+            Create your account
+          </h2>
         </div>
 
         {error && (
@@ -78,7 +78,10 @@ const SignUpForm = () => {
         <form className="space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-5">
             <div>
-              <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="fullName"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Full Name
               </label>
               <input
@@ -94,7 +97,10 @@ const SignUpForm = () => {
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Email
               </label>
               <input
@@ -108,9 +114,12 @@ const SignUpForm = () => {
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
-            
+
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Password
               </label>
               <input
@@ -125,9 +134,12 @@ const SignUpForm = () => {
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
-            
+
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+              <label
+                htmlFor="confirmPassword"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
                 Confirm Password
               </label>
               <input
@@ -157,7 +169,10 @@ const SignUpForm = () => {
         <div className="text-center mt-8">
           <p className="text-gray-600">
             Already have an account?{" "}
-            <Link to="/login" className="font-medium text-blue-600 hover:underline">
+            <Link
+              to="/login"
+              className="font-medium text-blue-600 hover:underline"
+            >
               Login
             </Link>
           </p>

@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const LoginForm = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -32,10 +34,8 @@ const LoginForm = () => {
         setError(data.error || "Sign-in failed");
         console.error("Sign-in failed:", data.error);
       } else {
-        console.log("Sign-in successful:", data);
-        // Store user data in localStorage
-        localStorage.setItem("user", JSON.stringify(data.user));
-        navigate("/");
+        login(data.user, data.token);
+        navigate("/", { replace: true });
       }
     } catch (error) {
       setError("Network error. Please try again.");

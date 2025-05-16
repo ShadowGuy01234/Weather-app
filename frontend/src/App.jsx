@@ -5,8 +5,10 @@ import {
   Route,
   useLocation,
   Link,
+  Navigate,
 } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 
 import Home from "./pages/Home";
 import About from "./pages/About";
@@ -21,18 +23,21 @@ import WeatherChatbot from "./components/WeatherChatbot";
 
 function App() {
   return (
-    <Router>
-      <LayoutWrapper>
-        <AnimatedRoutes />
-      </LayoutWrapper>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <LayoutWrapper>
+          <AnimatedRoutes />
+        </LayoutWrapper>
+      </Router>
+    </AuthProvider>
   );
 }
 
 // Optional: Hide Navbar/Footer/Chatbot on auth pages
 function LayoutWrapper({ children }) {
   const location = useLocation();
-  const isAuthPage = location.pathname === "/login" || location.pathname === "/signup";
+  const isAuthPage =
+    location.pathname === "/login" || location.pathname === "/signup";
 
   return (
     <>
@@ -44,18 +49,65 @@ function LayoutWrapper({ children }) {
   );
 }
 
+// Add this ProtectedRoute component before the AnimatedRoutes component
+function ProtectedRoute({ children }) {
+  const { isAuthenticated, loading } = useAuth();
+  const location = useLocation();
+
+  if (loading) {
+    return <div>Loading...</div>; // Or your loading component
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  return children;
+}
+
 function AnimatedRoutes() {
   const location = useLocation();
 
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
-        <Route path="/" element={<Home />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/features" element={<Features />} />
-        <Route path="/news" element={<WeatherNewsPage />} />
+        {/* Public routes */}
         <Route path="/login" element={<LoginForm />} />
         <Route path="/signup" element={<SignUpForm />} />
+
+        {/* Protected routes */}
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/about"
+          element={
+            <ProtectedRoute>
+              <About />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/features"
+          element={
+            <ProtectedRoute>
+              <Features />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/news"
+          element={
+            <ProtectedRoute>
+              <WeatherNewsPage />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </AnimatePresence>
   );
