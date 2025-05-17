@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { motion } from "framer-motion";
 
 const LoginForm = () => {
   const navigate = useNavigate();
@@ -11,22 +12,27 @@ const LoginForm = () => {
     rememberMe: false,
   });
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setLoading(true);
 
     try {
-      const response = await fetch("https://weather-app-backend-774123782107.us-central1.run.app/signin", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password,
-        }),
-      });
+      const response = await fetch(
+        "https://weather-app-backend-774123782107.us-central1.run.app/signin",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: formData.email,
+            password: formData.password,
+          }),
+        }
+      );
 
       const data = await response.json();
 
@@ -40,6 +46,8 @@ const LoginForm = () => {
     } catch (error) {
       setError("Network error. Please try again.");
       console.error("Error during sign-in request:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -52,18 +60,34 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50">
-      <div className="bg-white shadow-xl rounded-2xl p-8 w-full max-w-md border border-gray-100">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-50 to-blue-100"
+    >
+      <motion.div
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.2 }}
+        className="bg-white/80 backdrop-blur-sm shadow-2xl rounded-2xl p-8 w-full max-w-md border border-blue-100"
+      >
         <div className="text-center mb-8">
           <div className="text-5xl mb-4">☁️</div>
-          <h1 className="text-3xl font-bold text-blue-700">WeatherWise</h1>
+          <h1 className="text-3xl font-bold text-blue-700">WeatherPro</h1>
           <p className="text-gray-600 mt-2">Your accurate weather companion</p>
         </div>
 
         {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-            {error}
-          </div>
+          <motion.div
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded mb-4"
+          >
+            <p className="flex items-center">
+              <span className="mr-2">❌</span>
+              {error}
+            </p>
+          </motion.div>
         )}
 
         <form className="space-y-6" onSubmit={handleSubmit}>
@@ -104,12 +128,45 @@ const LoginForm = () => {
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
-            <button
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               type="submit"
-              className="w-full bg-green-600 text-white py-3 rounded-lg font-medium hover:bg-green-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+              disabled={loading}
+              className={`w-full bg-blue-600 text-white py-3 rounded-lg font-medium transition duration-200
+                ${
+                  loading
+                    ? "opacity-70 cursor-not-allowed"
+                    : "hover:bg-blue-700"
+                }`}
             >
-              Sign In
-            </button>
+              {loading ? (
+                <span className="flex items-center justify-center">
+                  <svg
+                    className="animate-spin h-5 w-5 mr-3"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                      fill="none"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                    />
+                  </svg>
+                  Signing in...
+                </span>
+              ) : (
+                "Sign In"
+              )}
+            </motion.button>
           </div>
         </form>
         <div className="text-center mt-8">
@@ -123,8 +180,8 @@ const LoginForm = () => {
             </Link>
           </p>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 
