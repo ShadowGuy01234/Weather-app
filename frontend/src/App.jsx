@@ -36,6 +36,7 @@ function App() {
 // Optional: Hide Navbar/Footer/Chatbot on auth pages
 function LayoutWrapper({ children }) {
   const location = useLocation();
+  const { isAuthenticated } = useAuth();
   const isAuthPage =
     location.pathname === "/login" || location.pathname === "/signup";
 
@@ -43,22 +44,22 @@ function LayoutWrapper({ children }) {
     <>
       {!isAuthPage && <Navbar />}
       {children}
-      {!isAuthPage && <WeatherChatbot />}
+      {!isAuthPage && isAuthenticated && <WeatherChatbot />}
       {!isAuthPage && <Footer />}
     </>
   );
 }
 
 // Add this ProtectedRoute component before the AnimatedRoutes component
-function ProtectedRoute({ children }) {
+function ProtectedRoute({ children, isHomePage = false }) {
   const { isAuthenticated, loading } = useAuth();
   const location = useLocation();
 
   if (loading) {
-    return <div>Loading...</div>; // Or your loading component
+    return <div>Loading...</div>;
   }
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated && !isHomePage) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
@@ -75,15 +76,17 @@ function AnimatedRoutes() {
         <Route path="/login" element={<LoginForm />} />
         <Route path="/signup" element={<SignUpForm />} />
 
-        {/* Protected routes */}
+        {/* Home route - accessible without auth */}
         <Route
           path="/"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute isHomePage={true}>
               <Home />
             </ProtectedRoute>
           }
         />
+
+        {/* Protected routes */}
         <Route
           path="/about"
           element={
