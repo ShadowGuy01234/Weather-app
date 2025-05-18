@@ -5,23 +5,35 @@ import { useAuth } from "../context/AuthContext";
 
 function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { logout, user } = useAuth();
-  console.log(user);
+  const { logout, user, isAuthenticated } = useAuth();
 
-  const navItems = [
+  const publicNavItems = [
     { name: "Home", path: "/" },
+  ];
+
+  const privateNavItems = [
     { name: "News", path: "/news" },
     { name: "Features", path: "/features" },
     { name: "About", path: "/about" },
-    {
-      name: "Logout",
-      path: "/login",
-      onClick: () => {
-        logout();
-        window.location.href = "/login";
-      },
-    },
   ];
+
+  const authNavItems = isAuthenticated
+    ? [
+        ...publicNavItems,
+        ...privateNavItems,
+        {
+          name: "Logout",
+          path: "/login",
+          onClick: () => {
+            logout();
+            window.location.href = "/login";
+          },
+        },
+      ]
+    : [
+        ...publicNavItems,
+        { name: "Login", path: "/login" },
+      ];
 
   return (
     <>
@@ -60,7 +72,7 @@ function Navbar() {
 
             <div className="hidden lg:flex items-center space-x-1">
               <div className="flex space-x-1">
-                {navItems.map((item) => (
+                {authNavItems.map((item) => (
                   <motion.a
                     key={item.name}
                     href={item.path}
@@ -102,7 +114,7 @@ function Navbar() {
               className="lg:hidden border-t border-blue-600/20"
             >
               <div className="px-2 pt-2 pb-3 space-y-1 bg-blue-800/10 backdrop-blur-sm">
-                {navItems.map((item) => (
+                {authNavItems.map((item) => (
                   <motion.a
                     key={item.name}
                     href={item.path}
